@@ -686,6 +686,7 @@ class Helper
 
         $list = array_slice($list, 0, $limit);
         $value = implode("\n", $list);
+        $value = $value.$end;
 
         $reached = true;
         return $value;

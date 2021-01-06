@@ -375,7 +375,7 @@ HTML;
 
             return collect($value)->map(function ($name) use ($class, $background) {
                 return "<span class='badge bg-{$class}' $background>$name</span>";
-            })->implode('&nbsp;');
+            })->implode(' ');
         });
     }
 

@@ -5,7 +5,6 @@ namespace Dcat\Admin\Grid;
 use Dcat\Admin\Admin;
 use Dcat\Admin\Exception\AdminException;
 use Dcat\Admin\Grid;
-use Dcat\Admin\Http\Middleware\Pjax;
 use Dcat\Admin\Repositories\Repository;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -469,28 +468,6 @@ class Model
     }
 
     /**
-     * If current page is greater than last page, then redirect to last page.
-     *
-     * @param LengthAwarePaginator $paginator
-     *
-     * @return void
-     */
-    protected function handleInvalidPage(LengthAwarePaginator $paginator)
-    {
-        if (
-            $this->usePaginate
-            && $paginator->lastPage()
-            && $paginator->currentPage() > $paginator->lastPage()
-        ) {
-            $lastPageUrl = $this->request->fullUrlWithQuery([
-                $paginator->getPageName() => $paginator->lastPage(),
-            ]);
-
-            Pjax::respond(redirect($lastPageUrl));
-        }
-    }
-
-    /**
      * Get current page.
      *
      * @return int|null
@@ -579,10 +556,10 @@ class Model
         }
 
         if (empty($this->sort['column']) || empty($this->sort['type'])) {
-            return [null, null];
+            return [null, null, null];
         }
 
-        return [$this->sort['column'], $this->sort['type']];
+        return [$this->sort['column'], $this->sort['type'], $this->sort['cast'] ?? null];
     }
 
     /**

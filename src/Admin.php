@@ -20,16 +20,18 @@ use Illuminate\Auth\GuardHelpers;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Str;
+use Symfony\Component\HttpFoundation\Response;
 
 class Admin
 {
     use HasAssets;
     use HasHtml;
 
-    const VERSION = '2.0.15-beta';
+    const VERSION = '2.0.16-beta';
 
     const SECTION = [
         // 往 <head> 标签内输入内容
@@ -365,6 +367,24 @@ class Admin
     }
 
     /**
+     * 响应并中断后续逻辑.
+     *
+     * @param Response|string|array $response
+     *
+     * @throws HttpResponseException
+     */
+    public static function exit($response = '')
+    {
+        if (is_array($response)) {
+            $response = response()->json($response);
+        } elseif ($response instanceof JsonResponse) {
+            $response = $response->send();
+        }
+
+        throw new HttpResponseException($response instanceof Response ? $response : response($response));
+    }
+
+    /**
      * 类自动加载器.
      *
      * @return \Composer\Autoload\ClassLoader
@@ -453,6 +473,7 @@ class Admin
     public static function routes()
     {
         $attributes = [
+            'domain'     => config('admin.route.domain'),
             'prefix'     => config('admin.route.prefix'),
             'middleware' => config('admin.route.middleware'),
             'as'         => static::app()->getName().'.',
@@ -497,6 +518,7 @@ class Admin
     public static function registerApiRoutes(string $as = null)
     {
         $attributes = [
+            'domain'     => config('admin.route.domain'),
             'prefix'     => admin_base_path('dcat-api'),
             'middleware' => config('admin.route.middleware'),
             'as'         => $as ?: static::app()->getApiRoutePrefix(Application::DEFAULT),
@@ -528,6 +550,7 @@ class Admin
         }
 
         $attributes = [
+            'domain'     => config('admin.route.domain'),
             'prefix'     => config('admin.route.prefix'),
             'middleware' => config('admin.route.middleware'),
             'as'         => static::app()->getName().'.',

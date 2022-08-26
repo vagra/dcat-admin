@@ -667,15 +667,47 @@ class Helper
      * @param  string  $value
      * @param  int  $limit
      * @param  string  $end
+     * @param  bool  $reached
      * @return string
      */
-    public static function strLimit($value, $limit = 100, $end = '...')
+    public static function strLimit($value, $limit = 100, $end = '...', &$reached)
     {
+        $reached = false;
+
         if (mb_strlen($value, 'UTF-8') <= $limit) {
             return $value;
         }
 
+        $reached = true;
+
         return rtrim(mb_substr($value, 0, $limit, 'UTF-8')).$end;
+    }
+
+    /**
+     * Limit the number of rows in a string.
+     *
+     * @param  string  $value
+     * @param  int  $limit
+     * @param  string  $end
+     * @param  bool  $reached
+     * @return string
+     */
+    public static function rowLimit($value, $limit = 5, $end = '...', &$reached)
+    {
+        $reached = false;
+
+        $list = explode("\n", $value);
+
+        if (count($list) <= $limit) {
+            return $value;
+        }
+
+        $list = array_slice($list, 0, $limit);
+        $value = implode("\n", $list);
+        $value = $value.$end;
+
+        $reached = true;
+        return $value;
     }
 
     /**

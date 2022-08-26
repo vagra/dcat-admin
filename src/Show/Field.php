@@ -593,6 +593,18 @@ HTML;
     }
 
     /**
+     * Convert '\n' to <br />
+     *
+     * @return $this
+     */
+    public function nl2br()
+    {
+        return $this->unescape()->as(function ($value) {
+            return nl2br($value);
+        });
+    }
+
+    /**
      * @param  mixed  $value
      * @param  callable  $callback
      * @return $this|mixed

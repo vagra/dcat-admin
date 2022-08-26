@@ -195,6 +195,7 @@ export default class Helpers {
 
     // 预览图片
     previewImage(src, width, title) {
+        src = src.replace('-s.', '.');
         let Dcat = this.dcat,
             img = new Image(),
             win = this.isset(window.top) ? top : window,

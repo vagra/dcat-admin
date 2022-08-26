@@ -74,6 +74,18 @@ trait HasDisplayers
     }
 
     /**
+     * Convert '\n' to <br />
+     *
+     * @return $this
+     */
+    public function nl2br()
+    {
+        return $this->display(function ($value) {
+            return nl2br($value);
+        });
+    }
+
+    /**
      * Display column with "long2ip".
      *
      * @param  null  $default

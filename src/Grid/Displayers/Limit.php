@@ -18,7 +18,7 @@ JS;
         Admin::script($script);
     }
 
-    public function display($limit = 100, $end = '...')
+    public function display($limit = 100, $end = '...', $row = false)
     {
         $this->value = Helper::htmlEntityEncode($this->value);
 
@@ -37,23 +37,43 @@ JS;
             return $value;
         }
 
-        // 字符串
+        // 行或字符串
         $this->addScript();
 
-        $value = Helper::strLimit($this->value, $limit, $end);
+        $reached = false;
+        $original = '';
 
-        if ($value == $this->value) {
-            return $value;
+        if ($row) {
+            // 行
+            $value = Helper::rowLimit($this->value, $limit, $end, $reached);
+            $value = nl2br($value);
+
+            if (!$reached) {
+                return $value;
+            }
+
+            $original = $this->column->getOriginal();
+            $original = nl2br($original);
+
+        } else {
+            // 字符串
+            $value = Helper::strLimit($this->value, $limit, $end, $reached);
+
+            if (!$reached) {
+                return $value;
+            }
+
+            $original = $this->column->getOriginal();
         }
 
         return <<<HTML
 <div class="limit-text">
     <span class="text">{$value}</span>
-    &nbsp;<a href="javascript:void(0);" class="limit-more">&nbsp;<i class="fa fa-angle-double-down"></i></a>
+    <a href="javascript:void(0);" class="limit-more"><i class="fa fa-angle-down"></i></a>
 </div>
 <div class="limit-text d-none">
-    <span class="text">{$this->value}</span>
-    &nbsp;<a href="javascript:void(0);" class="limit-more">&nbsp;<i class="fa fa-angle-double-up"></i></a>
+    <span class="text">{$original}</span>
+    <a href="javascript:void(0);" class="limit-more"><i class="fa fa-angle-up"></i></a>
 </div>
 HTML;
     }
